@@ -1,7 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@300&display=swap');
-
 body {
-  background-image: url('./background.png');
+  background-image: url('./assets/background.png');
   display: inline-block;
 }
 
