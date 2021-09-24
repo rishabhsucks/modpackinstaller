@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@300&display=swap');
+
+body {
+  background-image: url('./background.png');
+  display: inline-block;
+}
+
+input[type=text], select {
+  padding: 12px 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  opacity: 0.5;
+}
+
+input:focus {
+  outline: none !important;
+  opacity: 0.8;
+}
+
+.link {
+  width: 50%;
+  margin-top: 130px;
+  margin-left: 300px;
+}
+
+.install {
+  background-color: gray; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 4px;
+  width: 10%;
+  opacity: 0.5;
+  position: absolute;
+  top: 138px;
+  left: 560px;
+  height: 41px;
+}
+
+.install:hover {
+  opacity: 0.9;
+}
+
+.loader {
+  border: 5px solid darkgray; /* Light grey */
+  border-top: 5px solid lavender; /* Blue */
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 5s linear infinite;
+  position:absolute;
+  top: 143px;
+  left: 650px;
+  opacity: 0.5;
+  display: none;
+}
+
+.error {
+  position: absolute;
+  top: 172px;
+  left: 310px;
+  color: gray;
+  font-family: 'Urbanist', sans-serif;
+  display: none;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

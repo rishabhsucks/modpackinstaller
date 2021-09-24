@@ -1,22 +1,66 @@
 {
-  "name": "electron-quick-start",
+  "name": "installer",
   "version": "1.0.0",
-  "description": "A minimal Electron application",
+  "description": "A universal modpack installer",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
-  "repository": "https://github.com/electron/electron-quick-start",
+  "repository": "https://github.com/rishabhsucks/modpackinstaller",
   "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
+    "modpack",
+    "forge",
+    "fabric",
+    "mods",
+    "minecraft"
   ],
-  "author": "GitHub",
-  "license": "CC0-1.0",
+  "author": "Rishabh Roy",
+  "license": "",
   "devDependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.61",
+    "@electron-forge/maker-deb": "^6.0.0-beta.61",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.61",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.61",
+    "@electron-forge/maker-zip": "^6.0.0-beta.61",
     "electron": "^15.0.0"
+  },
+  "dependencies": {
+    "child_process": "^1.0.2",
+    "copy-dir": "^1.3.0",
+    "electron-squirrel-startup": "^1.0.0",
+    "fs": "^0.0.1-security",
+    "node-downloader-helper": "^1.0.18",
+    "path": "^0.12.7",
+    "source-map-support": "^0.5.20",
+    "unzipper": "^0.10.11"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {},
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "installer"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
+    }
   }
 }
