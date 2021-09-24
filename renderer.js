@@ -25,7 +25,7 @@ const bytesToMegaBytes = bytes => bytes / (1024*1024);
 
 // Download Files
 function download(url, dest, name, callback) {
-    const dl = new DownloaderHelper(url, dest, {fileName: name});   
+    const dl = new DownloaderHelper(url, dest, {fileName: name});
     dl.on('end', callback)
     dl.on('progress.throttled', stats =>
     {
