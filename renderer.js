@@ -12,7 +12,6 @@ const unzipper = require('unzipper')
 const { DownloaderHelper } = require('node-downloader-helper');
 const copydir = require('copy-dir')
 const childprocess = require('child_process');
-// const { stringify } = require('querystring');
 
 // Write messages under text input
 function writeOnScreen(message) {
@@ -41,7 +40,7 @@ function correctPath(pathToFile) {
         pathToFile = pathToFile.substring(1)
         pathToFile = applicationSupportPath + pathToFile
     }
-    else {
+    if (process.platform == "win32") {
         appdataPath = path.join(process.env.APPDATA, "/modpackInstaller")
         pathToFile = pathToFile.substring(1)
         pathToFile = path.join(appdataPath, pathToFile)
@@ -55,7 +54,7 @@ function prepareJson(profileData) {
     if (process.platform == "darwin") {
         tempProfile["gameDir"] = path.join("/Users/", process.env.USER, "/Library/Application Support/minecraft/", tempProfile["gameDir"])
     }
-    else {
+    if (process.platform == "win32") {
         tempProfile["gameDir"] = path.join(process.env.APPDATA.replace("\\", "/"), "/", tempProfile["gameDir"])
     }
 
@@ -67,7 +66,7 @@ function editLauncherProfiles(tempProfile, callback) {
     if (process.platform == "darwin") {
         launcherProfilePath = path.join("/Users/", process.env.USER, "/Library/Application Support/minecraft/launcher_profiles.json")
     }
-    else {
+    if (process.platform == "win32") {
         launcherProfilePath = path.join(process.env.APPDATA, "/.minecraft/launcher_profiles.json")
     }
     console.log(launcherProfilePath)
@@ -101,7 +100,7 @@ function cleanUp() {
             fs.rmSync(applicationSupportPath, {recursive: true})
         }
     }
-    else {
+    if (process.platform == "win32") {
         appdataPath = path.join(process.env.APPDATA, "/modpackInstaller")
         if (fs.existsSync(appdataPath)) {
             fs.rmSync(appdataPath, { recursive: true })
@@ -136,7 +135,7 @@ function install() {
             fs.mkdirSync("/Users/" + process.env.USER + "/Library/Application Support/modpackInstaller")
         }
     } 
-    else {
+    if (process.platform == "win32") {
         if (!fs.existsSync(path.join(process.env.APPDATA, "/modpackInstaller"))) {
             fs.mkdirSync(path.join(process.env.APPDATA, "/modpackInstaller"))
         }
