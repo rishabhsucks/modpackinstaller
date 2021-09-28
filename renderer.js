@@ -48,6 +48,22 @@ function correctPath(pathToFile) {
     return pathToFile
 }
 
+function isModpack() {
+    if (!(fs.existsSync(correctPath("./modpack")))) {
+        return false;
+    }
+    if (!(fs.existsSync(correctPath("./modpack/installer")))) {
+        return false;
+    }
+    if(!(fs.existsSync(correctPath("./modpack/installer/profile.json")))) {
+        return false;
+    }
+    if (!(fs.existsSync(correctPath("./modpack/installer/installer.jar")))) {
+        return false;
+    }
+    return true;
+}
+
 // Add path to JSON
 function prepareJson(profileData) {
     tempProfile = profileData["profiles"]["profile"]
@@ -69,7 +85,6 @@ function editLauncherProfiles(tempProfile, callback) {
     if (process.platform == "win32") {
         launcherProfilePath = path.join(process.env.APPDATA, "/.minecraft/launcher_profiles.json")
     }
-    console.log(launcherProfilePath)
     fs.readFile(launcherProfilePath, 'utf8', (err, data) => {
         profileName = tempProfile["name"].toLowerCase().replace(" ", "")
         launcherProfileData = JSON.parse(data)
@@ -128,8 +143,7 @@ function cleanError() {
 
 // Install function
 function install() {
-
-    console.log(process.platform)
+    console.log("Installing on " + process.platform)
     if (process.platform == "darwin") {
         if (!fs.existsSync("/Users/" + process.env.USER + "/Library/Application Support/modpackInstaller")) {
             fs.mkdirSync("/Users/" + process.env.USER + "/Library/Application Support/modpackInstaller")
@@ -143,31 +157,36 @@ function install() {
 
     document.getElementById('loader').style.display = "block"
     let profileData;
-    console.log(document.getElementById('link').value)
+    console.log("Using modpack at " + document.getElementById('link').value)
     try {
         download(document.getElementById('link').value, correctPath("./"), "modpack.zip", () => {
             writeOnScreen("Extracting");
             fs.createReadStream(correctPath('./modpack.zip'))
                 .pipe(unzipper.Extract({ path: correctPath('./') })).on('close', () => {
-                    writeOnScreen("Moving Game Directory");
-                    profilePath = correctPath("./modpack/installer/profile.json")
-                    fs.readFile(profilePath, "utf8", (err, data) => {
-                        console.log(data)
-                        profileData = JSON.parse(data)
-                        tempProfile = prepareJson(profileData)
-                        console.log(tempProfile)
-                        copydir.sync(correctPath("./modpack"), tempProfile["gameDir"])
-                        writeOnScreen("Installing Modloader")
-                        childprocess.exec('java -jar \"' + correctPath('./modpack/installer/installer.jar') + "\"", { encoding: 'utf-8', cwd: correctPath("./")}, () => {
-                            writeOnScreen("Inserting Profile")
-                            editLauncherProfiles(tempProfile, () => {
-                                cleanUp()
-                                console.log("done!")
-                                document.getElementById('loader').style.display = "none"
-                                writeOnScreen("Modpack Successfully Installed")
-                            })
+                    writeOnScreen("Verifying Modpack")
+                    if (!(isModpack())) {
+                        writeOnScreen("Link is not a valid modpack!");
+                        cleanUp();
+                    }
+                    else {
+                        writeOnScreen("Moving Game Directory");
+                        profilePath = correctPath("./modpack/installer/profile.json")
+                        fs.readFile(profilePath, "utf8", (err, data) => {
+                            profileData = JSON.parse(data)
+                            tempProfile = prepareJson(profileData)
+                            copydir.sync(correctPath("./modpack"), tempProfile["gameDir"])
+                            writeOnScreen("Installing Modloader")
+                            childprocess.exec('java -jar \"' + correctPath('./modpack/installer/installer.jar') + "\"", { encoding: 'utf-8', cwd: correctPath("./")}, () => {
+                                writeOnScreen("Inserting Profile")
+                                editLauncherProfiles(tempProfile, () => {
+                                    cleanUp()
+                                    console.log("done!")
+                                    document.getElementById('loader').style.display = "none"
+                                    writeOnScreen("Modpack Successfully Installed")
+                                })
+                            });
                         });
-                });
+                    }   
             });
     
         })
