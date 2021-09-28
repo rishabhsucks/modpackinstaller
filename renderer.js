@@ -22,17 +22,6 @@ function writeOnScreen(message) {
 // Convert bytes to megabytes
 const bytesToMegaBytes = bytes => bytes / (1024*1024);
 
-// Download Files
-function download(url, dest, name, callback) {
-    const dl = new DownloaderHelper(url, dest, {fileName: name});
-    dl.on('end', callback)
-    dl.on('progress.throttled', stats =>
-    {
-        writeOnScreen("Downloading: " + stats.progress.toFixed(0) + "% " + bytesToMegaBytes(stats.speed).toFixed(2) + "MB/s");
-    })
-    dl.start();
-}
-
 // Store temp in appdata
 function correctPath(pathToFile) {
     if (process.platform == 'darwin') {
@@ -141,6 +130,22 @@ function cleanError() {
     cleanUp()
 }
 
+// Download Files
+function download(url, dest, name, callback) {
+    const dl = new DownloaderHelper(url, dest, {fileName: name});
+    dl.on('end', callback)
+    dl.on('progress.throttled', stats =>
+    {
+        writeOnScreen("Downloading: " + stats.progress.toFixed(0) + "% " + bytesToMegaBytes(stats.speed).toFixed(2) + "MB/s");
+    })
+    dl.on('error', () => {
+        cleanUp()
+        writeOnScreen("Invalid Download Link!")
+        document.getElementById('loader').style.display = "none"
+    })
+    dl.start();
+}
+
 // Install function
 function install() {
     console.log("Installing on " + process.platform)
@@ -159,41 +164,51 @@ function install() {
     let profileData;
     console.log("Using modpack at " + document.getElementById('link').value)
     try {
-        download(document.getElementById('link').value, correctPath("./"), "modpack.zip", () => {
-            writeOnScreen("Extracting");
-            fs.createReadStream(correctPath('./modpack.zip'))
-                .pipe(unzipper.Extract({ path: correctPath('./') })).on('close', () => {
-                    writeOnScreen("Verifying Modpack")
-                    if (!(isModpack())) {
-                        writeOnScreen("Link is not a valid modpack!");
-                        cleanUp();
-                    }
-                    else {
-                        writeOnScreen("Moving Game Directory");
-                        profilePath = correctPath("./modpack/installer/profile.json")
-                        fs.readFile(profilePath, "utf8", (err, data) => {
-                            profileData = JSON.parse(data)
-                            tempProfile = prepareJson(profileData)
-                            copydir.sync(correctPath("./modpack"), tempProfile["gameDir"])
-                            writeOnScreen("Installing Modloader")
-                            childprocess.exec('java -jar \"' + correctPath('./modpack/installer/installer.jar') + "\"", { encoding: 'utf-8', cwd: correctPath("./")}, () => {
-                                writeOnScreen("Inserting Profile")
-                                editLauncherProfiles(tempProfile, () => {
-                                    cleanUp()
-                                    console.log("done!")
-                                    document.getElementById('loader').style.display = "none"
-                                    writeOnScreen("Modpack Successfully Installed")
-                                })
+        downloadLink = document.getElementById('link').value
+        if (!(downloadLink.substr(downloadLink.length - 4) == ".zip")) {
+            cleanUp()
+            writeOnScreen("Link is not a valid download link!")
+            document.getElementById('loader').style.display = "none"
+        }
+        else {
+            download(document.getElementById('link').value, correctPath("./"), "modpack.zip", () => {
+                writeOnScreen("Extracting");
+                fs.createReadStream(correctPath('./modpack.zip'))
+                    .pipe(unzipper.Extract({ path: correctPath('./') })).on('close', () => {
+                        writeOnScreen("Verifying Modpack")
+                        if (!(isModpack())) {
+                            cleanUp();
+                            writeOnScreen("Link is not a valid modpack!");
+                            document.getElementById('loader').style.display = "none"
+                        }
+                        else {
+                            writeOnScreen("Moving Game Directory");
+                            profilePath = correctPath("./modpack/installer/profile.json")
+                            fs.readFile(profilePath, "utf8", (err, data) => {
+                                profileData = JSON.parse(data)
+                                tempProfile = prepareJson(profileData)
+                                copydir.sync(correctPath("./modpack"), tempProfile["gameDir"])
+                                writeOnScreen("Installing Modloader")
+                                childprocess.exec('java -jar \"' + correctPath('./modpack/installer/installer.jar') + "\"", { encoding: 'utf-8', cwd: correctPath("./")}, () => {
+                                    writeOnScreen("Inserting Profile")
+                                    editLauncherProfiles(tempProfile, () => {
+                                        cleanUp()
+                                        console.log("done!")
+                                        document.getElementById('loader').style.display = "none"
+                                        writeOnScreen("Modpack Successfully Installed")
+                                    })
+                                });
                             });
-                        });
-                    }   
-            });
-    
-        })
+                        }   
+                });
+        
+            })
+        }
     }
     catch (error) {
-        writeOnScreen("Error Installing Modpack")
         cleanError()
+        writeOnScreen("Error Installing Modpack")
+        document.getElementById('loader').style.display = "none"
     }
 }
 
