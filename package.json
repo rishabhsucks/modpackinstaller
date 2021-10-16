@@ -43,7 +43,7 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "Modpack Installer"
+            "name": "installer"
           }
         },
         {
