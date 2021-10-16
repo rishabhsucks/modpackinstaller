@@ -43,9 +43,7 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "Modpack Installer",
-            "setupIcon": "assets/icon.ico",
-            "iconUrl": "assets/icon.ico"
+            "name": "Modpack Installer"
           }
         },
         {
