@@ -289,7 +289,15 @@ function moveModpack(callback) {
   fs.readFile(profilePath, "utf8", (err, data) => {
     let profileData = JSON.parse(data);
     tempProfile = prepareJson(profileData);
-    copydir.sync(correctPath("./modpack"), tempProfile["gameDir"]);
+    if (fs.existsSync(tempProfile["gameDir"])) {
+      fs.unlinkSync(path.join(tempProfile["gameDir"], "/mods"));
+      copydir.sync(
+        correctPath("./modpack/mods"),
+        path.join(tempProfile["gameDir"], "/mods")
+      );
+    } else {
+      copydir.sync(correctPath("./modpack"), tempProfile["gameDir"]);
+    }
     callback(tempProfile);
   });
 }

@@ -1,5 +1,5 @@
 {
-  "name": "installer",
+  "name": "modpackinstaller",
   "version": "1.0.0",
   "description": "A universal modpack installer",
   "main": "main.js",
@@ -8,7 +8,7 @@
     "package": "electron-forge package",
     "make": "electron-forge make"
   },
-  "repository": "https://github.com/rishabhsucks/modpackinstaller",
+  "repository": "https://github.com/rishbobb/modpackinstaller",
   "keywords": [
     "modpack",
     "forge",
@@ -22,11 +22,12 @@
     "@electron-forge/cli": "^6.0.0-beta.61",
     "@electron-forge/maker-deb": "^6.0.0-beta.61",
     "@electron-forge/maker-rpm": "^6.0.0-beta.61",
-    "@electron-forge/maker-squirrel": "^6.0.0-beta.61",
     "@electron-forge/maker-zip": "^6.0.0-beta.61",
     "electron": "^15.0.0"
   },
   "dependencies": {
+    "@electron-forge/maker-dmg": "^6.0.0-beta.63",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.63",
     "child_process": "^1.0.2",
     "copy-dir": "^1.3.0",
     "electron-squirrel-startup": "^1.0.0",
@@ -38,27 +39,25 @@
   },
   "config": {
     "forge": {
-      "packagerConfig": {},
+      "packagerConfig": {
+        "icon": "assets/icons/icon"
+      },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "installer"
+            "name": "modpackinstaller",
+            "iconUrl": "http://www.rishabhroy.com/misc/icon.ico",
+            "setupIcon": "./assets/icons/win/icon.ico"
           }
         },
         {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "darwin"
-          ]
-        },
-        {
-          "name": "@electron-forge/maker-deb",
-          "config": {}
-        },
-        {
-          "name": "@electron-forge/maker-rpm",
-          "config": {}
+          "name": "@electron-forge/maker-dmg",
+          "config": {
+            "format": "ULFO",
+            "icon": "./assets/icons/mac/icon.icns",
+            "background": "./assets/background.png"
+          }
         }
       ]
     }
